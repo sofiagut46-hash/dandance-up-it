@@ -110,7 +110,7 @@
             
             <div class="space-y-4 mb-8">
                 <div>
-                    <label class="block text-[10px] tracking-[0.2em] text-fuchsia-400 mb-1">YOUTUBE BGM URL</label>
+                    <label class="block text-[10px] tracking-[0.2em] text-fuchsia-400 mb-1">YOUTUBE BGM URL / ID</label>
                     <input type="text" id="yt-input" class="cyber-input w-full px-4 py-2 text-sm" placeholder="URL..." value="jfKfPfyJRdk">
                 </div>
                 <div class="flex gap-4">
@@ -121,10 +121,10 @@
                     <div class="flex-1">
                         <label class="block text-[10px] tracking-[0.2em] text-cyan-400 mb-1">DIFFICULTY</label>
                         <select id="diff-input" class="cyber-input w-full px-4 py-2 text-sm appearance-none">
-                            <option value="easy">Fácil</option>
+                            <option value="easy">Easy</option>
                             <option value="normal" selected>Normal</option>
-                            <option value="medium">Medio</option>
-                            <option value="hard">Difícil</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
                         </select>
                     </div>
                 </div>
@@ -133,10 +133,10 @@
             <button id="btn-start" class="cyber-btn w-full py-4 text-lg mb-6">INITIATE LINK (NUM 5)</button>
             
             <div class="grid grid-cols-4 gap-2 text-center text-[10px] font-bold tracking-wider">
-                <div class="text-purple-500 bg-purple-900/30 py-2 border border-purple-500/30">LEFT<br>NUM 4</div>
-                <div class="text-yellow-400 bg-yellow-900/30 py-2 border border-yellow-400/30">DOWN<br>NUM 2</div>
-                <div class="text-cyan-400 bg-cyan-900/30 py-2 border border-cyan-400/30">UP<br>NUM 8</div>
-                <div class="text-pink-500 bg-pink-900/30 py-2 border border-pink-500/30">RIGHT<br>NUM 6</div>
+                <div class="text-purple-500 bg-purple-900/30 py-2 border border-purple-500/30">LEFT<br>NUM 4 / ←</div>
+                <div class="text-yellow-400 bg-yellow-900/30 py-2 border border-yellow-400/30">DOWN<br>NUM 2 / ↓</div>
+                <div class="text-cyan-400 bg-cyan-900/30 py-2 border border-cyan-400/30">UP<br>NUM 8 / ↑</div>
+                <div class="text-pink-500 bg-pink-900/30 py-2 border border-pink-500/30">RIGHT<br>NUM 6 / →</div>
             </div>
         </div>
     </div>
@@ -291,14 +291,12 @@
             
             for(let x=0; x<size/2; x++) {
                 for(let y=0; y<size; y++) {
-                    // Simple procedural shape generation
                     if(Math.random() > 0.4 && y > 2 && y < 14) {
                         ctx.fillStyle = mainColor;
-                        // Add some shading occasionally
                         if(Math.random() > 0.8) ctx.fillStyle = '#ffffff'; 
                         
                         ctx.fillRect(x, y, 1, 1);
-                        ctx.fillRect(size - 1 - x, y, 1, 1); // Symmetry
+                        ctx.fillRect(size - 1 - x, y, 1, 1);
                     }
                 }
             }
@@ -308,7 +306,7 @@
             ctx.fillRect(10, 5, 2, 2);
 
             const texture = new THREE.CanvasTexture(canvas);
-            texture.magFilter = THREE.NearestFilter; // Sharp 8-bit look
+            texture.magFilter = THREE.NearestFilter;
             return texture;
         }
 
@@ -324,7 +322,7 @@
             charGroup.add(body);
             
             // Juggle Balls
-            const ballTex = generatePixelTexture(); // Reuse generator for small block
+            const ballTex = generatePixelTexture();
             const balls = [];
             for(let i=0; i<3; i++) {
                 const b = new THREE.Sprite(new THREE.SpriteMaterial({map: ballTex, color: Math.random()*0xffffff}));
@@ -380,11 +378,9 @@
 
         function spawnNote(laneIndex, targetHitTime) {
             const lane = LANES[laneIndex];
-            // Solid neon material
             const mat = new THREE.MeshBasicMaterial({ color: lane.color });
             const mesh = new THREE.Mesh(arrowGeo, mat);
             
-            // Initial position will be recalculated in animate loop based on time
             mesh.position.set(lane.x, 0.5, SPAWN_Z);
             mesh.rotation.x = -Math.PI / 2;
             mesh.rotation.z = lane.rot;
@@ -449,7 +445,7 @@
                 const note = scheduledNotes[i];
                 if (note.laneIndex === laneIndex && !note.isHit) {
                     const timeDiff = Math.abs(note.hitTime - songTime);
-                    if (timeDiff < minTimeDiff && timeDiff < 200) { // 200ms Hit window
+                    if (timeDiff < minTimeDiff && timeDiff < 200) {
                         minTimeDiff = timeDiff;
                         nearestNote = note;
                     }
@@ -575,8 +571,7 @@
                 if (songTime + timeFall >= nextBeatTime) {
                     const beatFraction = beatInterval / diffSettings.subBeats;
                     
-                    // Spawn logic based on difficulty
-                    if(Math.random() < 0.8) { // 80% chance to spawn on valid beats
+                    if(Math.random() < 0.8) {
                         const lane1 = Math.floor(Math.random() * LANES.length);
                         spawnNote(lane1, nextBeatTime);
                         
@@ -587,7 +582,6 @@
                         }
                     }
                     
-                    // Character spawning
                     if(Math.random() < 0.05 && characters.length < 4) spawnPixelCharacter();
 
                     nextBeatTime += beatFraction;
@@ -600,7 +594,7 @@
 
                     const timeRemaining = note.hitTime - songTime;
                     
-                    if (timeRemaining < -200) { // Missed completely
+                    if (timeRemaining < -200) { // Missed
                         showJudgment('MISS', '#ff0000', LANES[note.laneIndex].x);
                         combo = 0; document.getElementById('combo-display').style.opacity = 0;
                         noteGroup.remove(note.mesh);
@@ -608,7 +602,6 @@
                         continue;
                     }
 
-                    // Perfect visual sync: Calculate Z based on time remaining
                     const progress = 1 - (timeRemaining / timeFall);
                     note.mesh.position.z = SPAWN_Z + (TRACK_LENGTH * progress);
                 }
@@ -618,45 +611,35 @@
                     const char = characters[i];
                     const t = (songTime - char.spawnTime) / 1000;
                     
-                    // Bobbing to beat
                     char.body.position.y = char.baseY + Math.abs(Math.sin(songTime * Math.PI / beatInterval)) * 1.5;
                     
-                    // Juggling balls
                     char.balls.forEach(ball => {
                         ball.sprite.position.x = Math.cos(t * 3 + ball.offset) * 3;
                         ball.sprite.position.y = char.baseY + 4 + Math.sin(t * 3 + ball.offset) * 2;
                     });
-                    
-                    // Move forward slowly
-                    char.group.position.z += char.speed * (delta / 10);
-                    if(char.group.position.z > 20) {
+
+                    // Despawn old background characters
+                    if (t > 15) {
                         scene.remove(char.group);
                         characters.splice(i, 1);
                     }
                 }
-            }
-            lastSysTime = now;
 
-            // Environment Animation (Always running)
-            const globalTime = now / 1000;
-            gridHelper.position.z = (globalTime * 20 * diffSettings.speedMult) % 10;
-            
-            // Move particles towards camera
-            const positions = particles.geometry.attributes.position.array;
-            for(let i=2; i<positions.length; i+=3) {
-                positions[i] += 0.5;
-                if(positions[i] > 20) {
-                    positions[i] = -100;
-                    positions[i-1] = Math.random() * 40; // new Y
-                    positions[i-2] = (Math.random() - 0.5) * 100; // new X
+                // Ambient Animations
+                gridHelper.position.z = (songTime * 0.05 * diffSettings.speedMult) % 5;
+                const pos = particleGeo.attributes.position.array;
+                for (let i = 2; i < partCount * 3; i += 3) {
+                    pos[i] += 0.2 * diffSettings.speedMult;
+                    if (pos[i] > 20) pos[i] = -100;
                 }
+                particleGeo.attributes.position.needsUpdate = true;
             }
-            particles.geometry.attributes.position.needsUpdate = true;
 
+            lastSysTime = now;
             renderer.render(scene, camera);
         }
 
-        window.onload = animate;
+        animate();
     </script>
 </body>
 </html>
